@@ -1,6 +1,6 @@
 # CodingCatNotes
 
-This repo records the what I learned and interests which will be kept updating. It covers this area currently:
+This repo records what I learned and interests, which will be kept updating. What's covered currently:
 
 * Swift
 * AudioVisual
