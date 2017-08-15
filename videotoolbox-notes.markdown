@@ -79,5 +79,31 @@ VTCompressionSession 是一个 CoreFoundation 对象，通常它的生命周期�
 5. 完成：VTCompressionSessionCompleteFrames
 6. 销毁：VTCompressionSessionInvalidate
 
+### VTDecompressionProperties
+
+* kVTDecompressionPropertyKey_OutputPoolRequestedMinimumBufferCount
+    * 设置 decompression session 创建 CVPixelBufferPool 时的最小缓冲区个数
+    * 一般来说不用设置这个值，让 decompression session 自己决定就好了
+    * 置为 0 或 nil 会清除这个设置（也就是让 decompression session 自己决定）
+    * 如果在 decompression session 使用过程中设置了这个值则会重新创建 CVPixelBufferPool，并且原先的 CVPixelBuffer 会被销毁
+* kVTDecompressionPropertyKey_MinOutputPresentationTimeStampOfFramesBeingDecoded
+* kVTDecompressionPropertyKey_MaxOutputPresentationTimeStampOfFramesBeingDecoded
+
+> 一个 decompression session 可能在同时解码多个 frame，上面两个值表示这些 frame 中 presentation timestamp 最小的和最大的。
+
+### VTDecompressionSession
+
+与 VTCompressionSession 类似，VTDecompressionSession 也有下面这样的生命周期：
+
+1. 创建：VTDecompressionSessionCreate
+2. 设置：VTSessionSetProperty
+3. 解码：VTDecompressionSessionDecodeFrame
+4. 完成：VTDecompressionSessionFinishDelayedFrames
+5. 销毁：VTDecompressionSessionInvalidate
+
+需要注意的是，VTDecompressionSessionFinishDelayedFrames 可能会在解完所有未解码帧之前返回，所以如果想要确保在解码完所有帧后返回，应该用 VTDecompressionSessionWaitForAsynchronousFrames 代替 VTDecompressionSessionFinishDelayedFrames。
+
+如果解码过程中，有些帧的格式发生了较小的变化，可以使用 VTDecompressionSessionCanAcceptFormatDescription 来测试原来的 decompression session 是否可以兼容新格式，这样可以避免创建新的解码会话。
+
 
 
