@@ -59,6 +59,6 @@ let dic: CFDictionary = Unmanaged.fromOpaque(rawDic).takeUnretainedValue()
 CFDictionarySetValue(dic, Unmanaged.passUnretained(kCMSampleAttachmentKey_DisplayImmediately).toOpaque(), unsafeBitCast(kCFBooleanTrue, to: UnsafeRawPointer.self))
 ```
 
-
+`StackOverflow` 上另一题[这个答案](https://stackoverflow.com/a/33310021)也比较详细。
 
 
