@@ -61,4 +61,61 @@ CFDictionarySetValue(dic, Unmanaged.passUnretained(kCMSampleAttachmentKey_Displa
 
 `StackOverflow` 上另一题[这个答案](https://stackoverflow.com/a/33310021)也比较详细。
 
+### error handling
+
+对一个可能抛出异常的方法调用，可以使用 `try`、`try!` 和 `try?` 这三种方式：
+
+1. try
+    
+    需要在一个 `do-catch` 里使用，或者在这个 `do-catch` 的 surrounding scope 里处理可能抛出的异常，这意味着你也可以不使用 `do-catch`，但这个调用语句的 surrounding scope 要能处理这个异常，否则就会 crash。
+    
+    ```swift
+    var vendingMachine = VendingMachine()
+    vendingMachine.coinsDeposited = 8
+    do {
+        try buyFavoriteSnack(person: "Alice", vendingMachine: vendingMachine)
+    } catch VendingMachineError.invalidSelection {
+        print("Invalid Selection.")
+    } catch VendingMachineError.outOfStock {
+        print("Out of Stock.")
+    } catch VendingMachineError.insufficientFunds(let coinsNeeded) {
+        print("Insufficient funds. Please insert an additional \(coinsNeeded) coins.")
+    }
+    ```
+    
+    这个例子里，`do-catch` 结构并没有处理所有的错误，因此如果有其他错误出现，这个错误会被抛给这段代码的 surrounding scope 来处理。
+    
+2. try!
+
+    有的方法调用会抛出异常，比如说根据 URL 加载一张图片，但是如果这张图片是打包在 app bundle 里的，你知道这肯定不会抛出异常，所以这时候你就可以使用 `try!` 来调用这个方法：
+    
+    ```swift
+    let photo = try! loadImage(atPath: "./Resources/John Appleseed.jpg")
+    ```
+    
+    当然，如果真的有异常发生，那就会 crash 了。
+    
+3. try?
+
+    类似 `try!`，如果你不想处理异常，但又不想让可能的 crash 发生，就可以使用 `try?`：
+    
+    ```swift
+    func someThrowingFunction() throws -> Int {
+    // ...
+    }
+    
+    // 1.
+    let x = try? someThrowingFunction()
+    
+    // 2.
+    let y: Int?
+    do {
+        y = try someThrowingFunction()
+    } catch {
+        y = nil
+    }
+    ```
+    
+    上面的例子中，1 和 2 是等价的，当你使用 `try?` 的时候，可能的异常抛出会被转化为一个 nil 值。
+
 
