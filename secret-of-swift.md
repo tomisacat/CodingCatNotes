@@ -1,14 +1,14 @@
 ### Unamanged
 
-这个结构体类似于中间人，用于在 `C Opaque Pointer`（在 Swift 里为 `Unsafe|Mutable|RawPointer`） 和 `Object` 对象之间转换:
+这个结构体类似于中间人，用于在 `C Opaque Pointer`（在 Swift 里为 `Unsafe|Mutable|RawPointer`） 和 `AnyObject` 对象之间转换:
 
 ```
-Object <- Unmanaged -> Unsafe|Mutable|RawPointer
+AnyObject <- Unmanaged -> Unsafe|Mutable|RawPointer
 ```
 
 具体来说有以下使用方式：
 
-1. Object -> Unmanaged -> UnsafeMutableRawPointer
+1. AnyObject -> Unmanaged -> UnsafeMutableRawPointer
     
     ```swift
     let cfStr = "This is a string" as CFString
@@ -16,9 +16,9 @@ Object <- Unmanaged -> Unsafe|Mutable|RawPointer
     let ptr = bits.toOpaque() // Unmanaged -> UnsafeMutableRawPointer
     ```
     
-    其中，`passUnretained` 方法将一个 `Object` 对象转换为一个 `Unmanaged` 结构体，并且不增加它的引用计数。类似的，也有 `passRetained` 方法实现类似的功能，但会增加这个对象的引用计数。
+    其中，`passUnretained` 方法将一个 `AnyObject` 对象转换为一个 `Unmanaged` 结构体，并且不增加它的引用计数。类似的，也有 `passRetained` 方法实现类似的功能，但会增加这个对象的引用计数。
     
-2. UnsafeRawPointer -> Unamaged -> Object
+2. UnsafeRawPointer -> Unamaged -> AnyObject
 
     ```swift
     // 假设你有一个 UnsafeRawPointer 对象 ptr
@@ -26,7 +26,7 @@ Object <- Unmanaged -> Unsafe|Mutable|RawPointer
     let str: CFString = unmanagedStr.takeUnretainedValue() // Unmanaged -> CF Object
     ```
     
-    其中，`fromOpaque` 方法将一个 `UnsafeRawPointer` 对象转换为 `Unmanaged` 结构体，`takeUnretainedValue` 将这个结构体转换为一个 `Object`，并且不增加这个对象的引用计数。类似的，`takeRetainedValue` 会增加这个对象的引用计数。
+    其中，`fromOpaque` 方法将一个 `UnsafeRawPointer` 对象转换为 `Unmanaged` 结构体，`takeUnretainedValue` 将这个结构体转换为一个 `AnyObject`，并且不增加这个对象的引用计数。类似的，`takeRetainedValue` 会增加这个对象的引用计数。
     
 容易看出来上面的转换方法可以自由选择是否增加转换对象的引用计数，Swift 还提供了下面几个方法来增加或减少转换过程中这个中间对象的引用计数：
 
@@ -34,6 +34,23 @@ Object <- Unmanaged -> Unsafe|Mutable|RawPointer
 public func retain() -> Unmanaged<Instance>
 public func release()
 public func autorelease() -> Unmanaged<Instance>
+```
+
+注意到 `Unmanaged` 仅适用于 `AnyObject` 对象，也就是 `class` 类型的对象，那么对于 `String` 之类的 `struct` 类型的对象来说，可以使用下面的方法：
+
+```swift
+public func withUnsafeMutablePointer<T, Result>(to arg: inout T, _ body: (UnsafeMutablePointer<T>) throws -> Result) rethrows -> Result
+
+public func withUnsafePointer<T, Result>(to arg: inout T, _ body: (UnsafePointer<T>) throws -> Result) rethrows -> Result
+```
+
+比如：
+
+```swift
+var header: String = "\0x00\0x00\0x00\0x01"
+withUnsafePointer(to: &header) { (bytePointer) in
+     // handle bytePointer
+}
 ```
 
 ### unsafeBitCast
