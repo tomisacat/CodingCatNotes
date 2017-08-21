@@ -135,4 +135,12 @@ CFDictionarySetValue(dic, Unmanaged.passUnretained(kCMSampleAttachmentKey_Displa
     
     上面的例子中，1 和 2 是等价的，当你使用 `try?` 的时候，可能的异常抛出会被转化为一个 nil 值。
 
+### UnsafeMutablePointer/UnsafeMutableBufferPointer/UnsafeMutableRawBufferPointer
+
+### Collection
+
+### Hashable
+
+### RandomAccessCollection
+
 
