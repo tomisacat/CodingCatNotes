@@ -19,3 +19,19 @@ struct Block_layout {
 
 参考：[Why do nil / NULL blocks cause bus errors when run?](http://stackoverflow.com/questions/4145164/why-do-nil-null-blocks-cause-bus-errors-when-run)
 
+### Undefined symbols for architecture xxx
+
+![](images/undefinedsymbol.png)
+
+一般来说就是没有链接用到的库，比如说第三方静态库，那就要将用到的第三方库拖到 `Link Binary With Libraries`:
+
+![](images/linklibrary.png)
+
+或者是使用了 Cocoapods，这时需要设置 `Build Settings` -> `Linking` -> `Other Linker Flags`，增加 `$(inherited)`。
+
+更具体的可以参考[这篇](http://www.jianshu.com/p/a243b62b2e72)。
+
+### selector not recognized
+
+如果静态库里有 Category 方法，有时候会报这个错误，[苹果官方文档](https://developer.apple.com/library/content/qa/qa1490/_index.html)有解释。也可以参考[这篇](https://my.oschina.net/u/728866/blog/194741)。
+
