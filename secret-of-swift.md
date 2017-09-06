@@ -143,4 +143,16 @@ CFDictionarySetValue(dic, Unmanaged.passUnretained(kCMSampleAttachmentKey_Displa
 
 ### RandomAccessCollection
 
+### weak/unowned
+
+对于属性来说：
+
+1. unowned: 当指向的 class 实例的生命周期 >= 自己时
+2. weak: 当指向的 class 实例的生命周期 < 自己时
+
+对于 block 来说：
+
+1. unowned: 当 block 和 class 实例总是互相指向，并且同时 deallocate 时
+2. weak: 当 block capture 的 class 实例可能在某个时刻变成 nil 时
+
 
