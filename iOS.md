@@ -38,3 +38,5 @@ frame 相当于一个 computed property, setFrame 的时候改变了 center 和 
 
 在使用 autolayout 的情况下，如果 affineTransform != .identity，那么 view.frame 是 undefined 的。
 
+bounds.origin 只影响 subview 的座标系，不影响自身的 frame/center/anchorPoint 等。
+
