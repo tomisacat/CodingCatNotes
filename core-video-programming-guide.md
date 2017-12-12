@@ -70,7 +70,7 @@ Core Vide 是一个 `OS X` 系统处理数字视频的新模型。它提供两�
 
 图 1-1 `Core Video` Pipeline
 
-![](/img/corevideo_pipeline.png)
+![](/images/corevideo_pipeline.png)
 
 从视频源（比如 `QuickTime`）得到的帧数据被分配给一个可视上下文（visual context）。这个可视上下文仅简单地指定你想要渲染的视频的绘制目标。比如说，这个上下文可以是 `Core Graphic` 也可以是 `OpenGL`. 大多数情况下，可视上下文与窗口内的一个视图绑定在一起，但一个离屏渲染上下文也是可能存在的。
 
@@ -90,7 +90,7 @@ Core Vide 是一个 `OS X` 系统处理数字视频的新模型。它提供两�
 
 图 1-2
 
-![](/img/obtaining_frames.png)
+![](/images/obtaining_frames.png)
 
 * display link 周期性的调用你的回调来获取帧数据
 * 然后你的回调需要根据请求事件获取帧数据，根据这个帧数据你会得到一个 `OpenGL` 纹理（这个例子假设你从 `QuickTime` 中获取帧数据，但你可以使用任意视频源来提供帧数据）。
@@ -121,7 +121,7 @@ Core Vide 是一个 `OS X` 系统处理数字视频的新模型。它提供两�
 
 图 1-3 解压和处理 `QuickTime` 视频帧
 
-![](/img/recording_frames.png)
+![](/images/recording_frames.png)
 
 视频帧处理步骤为：
 
