@@ -39,7 +39,7 @@ remove 的时候要同时给 subview 发送 removeFromSuperview 消息，否则�
 * width
 * height
 * centerX/centerY(within margins)
-* base line(first/last)
+* base line(first/last)
 * margins(left/right/top/bottom/leading/trailing)
 * notAnAttribute
 
@@ -81,5 +81,55 @@ Content Hugging: 向内收缩，使视图紧贴内容
 Compression Resistance： 向外撑开，避免内容被裁剪
 
 ![](/images/intrinsic_content_size_2x.png)
+
+对于 view 来说，默认的 content hugging 是 250，compression resistance 是 750，也就是 view 更易于拉伸而不是收缩。
+
+### Layout Margins/Layout Guide
+
+UIView 有一个 layoutMargins 属性，是 UIEdgeInsets 类型，同时它还有一个 layoutMarginsGuide 属性，是 UILayoutGuide 类型，这个类型主要是用来辅助我们进行布局的，它本身并不渲染在视图的内容里，它主要有以下属性：
+
+* bottomAnchor
+* centerXAnchor
+* centerYAnchor
+* heightAnchor
+* widthAnchor
+* leadingAnchor
+* leftAnchor
+* rightAnchor
+* topAnchor
+* trailingAnchor
+
+iOS 11 修改了很多 api，其中 UIViewController 的 topLayoutGuide 和 bottomLayoutGuide 就被 view 的 safeAreaLayoutGuide 取代了。
+
+### Readable Content Guides
+
+view 的 readableContentGuide 属性定义了这个 view 里显示文本内容的最优宽度。理想情况下，它会尽量压缩使你一次看到尽可能多的内容。它的大小主要由系统字体的 dynamic type 来定。
+
+> 大多数设备上这个属性和 layoutMargins 没区别，主要在 iPad Landscape 模式下有区别。
+
+### Semantic Content
+
+view 有一个 semanticContentAttribute 属性，它决定了当语言从 left-to-right 变成 right-to left 时视图内容是否翻转。
+
+### NSLayoutAnchor
+
+view 的属性，主要有：
+
+* topAnchor
+* bottomAnchor
+* ...
+
+其实很类似 UILayoutGuide，因此，UILayoutGuide 就像是不渲染到视图里的 view 一样。
+
+### ScrollView
+
+[里脊串](http://adad184.com/2015/12/01/scrollview-under-autolayout/)
+
+### Self-Sizing Table View Cells
+
+```swift
+tableView.estimatedRowHeight = 85.0
+tableView.rowHeight = UITableViewAutomaticDimension
+```
 
 
