@@ -123,6 +123,11 @@ view 的属性，主要有：
 
 ### ScrollView
 
+* scroll view 通过修改 bounds.origin 来实现内容的滚动
+* 当 scroll view 使用 auto layout 的时候，它的 top/bottom/left/right 实际上是指它内部一个 ‘content view’ 的边界
+* 它的 contentSize 由 subview 决定，并且只有当 subviews 的约束能够确定一个具体的 size 时 scroll view 的约束才能是合法的
+* 要想使用 auto layout 来调整 scroll view 的 frame，那么它的约束必须满足：要么明确定义 scroll view 的 width/height，要么 scroll view 的边界（edges）必须和 subview 以外的视图产生约束
+
 [官方文档](https://developer.apple.com/library/content/technotes/tn2154/_index.html)
 [里脊串](http://adad184.com/2015/12/01/scrollview-under-autolayout/)
 
