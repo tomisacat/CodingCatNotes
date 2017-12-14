@@ -35,3 +35,19 @@ struct Block_layout {
 
 如果静态库里有 Category 方法，有时候会报这个错误，[苹果官方文档](https://developer.apple.com/library/content/qa/qa1490/_index.html)有解释。也可以参考[这篇](https://my.oschina.net/u/728866/blog/194741)。
 
+### embedded binaries VS link binary with libraries
+
+Link: 共用 framework，通过 linker 告诉 app 动态载入 framework
+embedded: 与 app 打包到同一个 bundle。然而实际上如果你是用 Swift，它目前依然是以独立的 Framework 链接到 app target
+
+[这里](https://github.com/Carthage/Carthage/issues/1046)有个解释：
+
+> Embedding binaries copies the entire framework to the target.
+for building for ios/tvOS/watchOS apple has been strict in not allowing that the frameworks bundled are "fat" (that means that the libraries are built for multiple architectures: arm+i386+x86_64 for example) for keeping the binary sizes low.
+that is why you should only link the frameworks but not embed them in ios, instead you add a run script phase that copies the framework stripping the data that does not belong to the target
+
+[Apple 官方关于 Framework 的文档](https://developer.apple.com/library/content/technotes/tn2435/_index.html)
+
+此外，如果是在同一个 app 内，即使是不同的 target（比如增加一个 Cocoa Touch Framework, 叫 TomCat.framework），也要用 embedded binaries 的方式，而如果是一个 workspace 里两个个不同的project（比如 Pods project）就需要用link的方式
+
+
