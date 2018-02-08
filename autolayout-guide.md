@@ -138,4 +138,14 @@ tableView.estimatedRowHeight = 85.0
 tableView.rowHeight = UITableViewAutomaticDimension
 ```
 
+### LayoutGuide
+
+对于 iOS 11 来说:
+
+> safeAreaLayoutGuide 的 top 在状态栏下面，bottom 就是 view 的 bottom
+
+对于 iOS 10 以及之前来说：
+
+> 1. topLayoutGuide 的 top 就是屏幕顶部，bottom 在状态栏下面
+> 2. bottomLayoutGuide 的 top 和 bottom 一样，都是屏幕底部
 
