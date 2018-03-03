@@ -165,8 +165,6 @@ CFDictionarySetValue(dic, Unmanaged.passUnretained(kCMSampleAttachmentKey_Displa
 
 对于集合类型，这个映射规则也同样适用。例如 OC 里的 NSArray/NSDictionary/NSSet 等，之前你只能存放 AnyObject 类型的元素，现在你可以存放 Any 类型的元素。
 
-既然如此，那么是否就应该只用 Any 而不用 AnyObject 呢？当然不是。首先，它仅限于 `bridged types` 类型，所以如果有自定义的 class 类型，那么你只能使用 AnyObject；其次，对于 Swift 这个强类型语言来说，类型越明确，编译器能做的检查更多，可以帮你写出更健壮的代码。
-
 > 参考：[Any vs. AnyObject in Swift 3.0](https://medium.com/@mimicatcodes/any-vs-anyobject-in-swift-3-b1a8d3a02e00)
 
 
