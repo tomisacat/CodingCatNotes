@@ -155,4 +155,18 @@ CFDictionarySetValue(dic, Unmanaged.passUnretained(kCMSampleAttachmentKey_Displa
 1. unowned: 当 block 和 class 实例总是互相指向，并且同时 deallocate 时
 2. weak: 当 block capture 的 class 实例可能在某个时刻变成 nil 时
 
+### Any/AnyObject
+
+与 OC/Cocoa 交互时，Swift 编译器会自动将 Swift 类型（主要是值类型）转化为 OC 类型（Int -> NSNumber），或者将 OC 类型转化为 Swift 类型（NSString -> String）。这些可以在 OC 和 Swift 之间相互转化的类型被称为 `bridged types`。
+
+因此，在任何可以使用 OC 可桥接类型（bridged types）的地方你都可以用 Swift 里对应的值类型代替。
+
+从 Swift 3 开始，OC 里的 `id` 类型会被映射成 `Any` 类型（而不是 AnyObject），相比映射成 `AnyObject` 类型，这减少了你手动`装箱/拆箱`的操作。
+
+对于集合类型，这个映射规则也同样适用。例如 OC 里的 NSArray/NSDictionary/NSSet 等，之前你只能存放 AnyObject 类型的元素，现在你可以存放 Any 类型的元素。
+
+既然如此，那么是否就应该只用 Any 而不用 AnyObject 呢？当然不是。首先，它仅限于 `bridged types` 类型，所以如果有自定义的 class 类型，那么你只能使用 AnyObject；其次，对于 Swift 这个强类型语言来说，类型越明确，编译器能做的检查更多，可以帮你写出更健壮的代码。
+
+> 参考：[Any vs. AnyObject in Swift 3.0](https://medium.com/@mimicatcodes/any-vs-anyobject-in-swift-3-b1a8d3a02e00)
+
 
