@@ -1,0 +1,117 @@
+常用的 type erasure 方法就是使用协议和继承。
+
+### 继承
+
+对于继承来说，Foundation 里的 NSString/NSArray 等类型，使用类簇（cluster）的方式，抽象出父类接口（NSArray），使用的时候，根据不同的初始化方法生成内部的类型（__NSPlacehodlerArray）。
+
+### 协议
+Swift 里定义一个类型时，遵循某个协议或者继承自某个类，写起来都一样。但实际上 Swift 不允许把协议当成一个类型一样使用（当这个协议有关联类型的时候）。例如：
+
+```swift
+func f(seq: Sequence<Int>) {} // error: cannot specialize non-generic type 'Sequence'
+```
+
+有些情况下可以使用泛型的方式（泛型类型仅用作函数参数类型）：
+
+```swift
+func f2<S: Sequence>(seq: S) where S.Element == Int { }
+```
+
+但是如果泛型类型是用来做函数返回值类型：
+
+```swift
+func f3<S: Sequence>() -> S where S.Element == Int { ... } // error: contextual type 'S' cannot be used with array literal
+```
+
+这个方法允许调用方自己选择想要的返回值类型（只需要遵循 Sequence 协议并且元素类型为 Int），但是这个方法的实现并不能事先知道调用方想要的类型，所以无法提供一种实现来满足所有调用方的需求。例如
+
+```swift
+class LeftSequence: Sequence {} ...
+class RightSequence: Sequence {} ...
+
+
+let left: LeftSequence<Int> = f3()
+// or
+let right: RightSequence<Int> = f3()
+```
+
+由于 LeftSequence 和 RightSequence 的实现可能天差地别，因此无法实现这么一个 f3 函数满足这两个类型。
+
+1. 使用类（类簇）的方式进行类型擦除
+
+```swift
+class MAnySequence<Element>: Sequence {
+    class Iterator: IteratorProtocol {
+        func next() -> Element? {
+            fatalError("Must Override next()")
+        }
+    }
+
+    func makeIterator() -> Iterator {
+        fatalError("Must override makeIterator()")
+    }
+}
+
+extension MAnySequence {
+    static func make<Seq: Sequence>(_ seq: Seq) -> MAnySequence<Element> where Seq.Element == Element {
+        return MAnySequenceImpl<Seq>(seq)
+    }
+}
+
+private class MAnySequenceImpl<Seq: Sequence>: MAnySequence<Seq.Element> {
+    class IteratorImpl: Iterator {
+        var wrapped: Seq.Iterator
+
+        init(_ wrapped: Seq.Iterator) {
+            self.wrapped = wrapped
+        }
+
+        override func next() -> Seq.Element? {
+            return wrapped.next()
+        }
+    }
+
+    var seq: Seq
+
+    init(_ seq: Seq) {
+        self.seq = seq
+    }
+
+    override func makeIterator() -> MAnySequence<Seq.Element>.Iterator {
+        return IteratorImpl(seq.makeIterator())
+    }
+}
+```
+
+这种方法本质上是使用一个 public 的接口来接受方法调用，内部使用（不同的）子类作为容器，父类则根据初始化参数生成不同的子类；当接口接收到方法调用的时候”转发“给子类容器中的元素。
+
+2. 使用函数的方式进行类型擦除
+
+```swift
+struct MAnySequence<Element>: Sequence {
+    struct Iterator: IteratorProtocol {
+        let _next: () -> Element?
+        
+        func next() -> Element? {
+            return _next()
+        }
+    }
+    
+    let _makeIterator: () -> Iterator
+    
+    func makeIterator() -> MAnySequence<Element>.Iterator {
+        return _makeIterator()
+    }
+    
+    init<Seq: Sequence>(_ seq: Seq) where Seq.Element == Element {
+        _makeIterator = {
+            var i = seq.makeIterator()
+            return Iterator(_next: { i.next() })
+        }
+    }
+}
+```
+
+这种方法与 1 类似，但他是将元素的方法包装成 closure.
+
+
