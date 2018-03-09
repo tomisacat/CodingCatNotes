@@ -115,3 +115,24 @@ struct MAnySequence<Element>: Sequence {
 这种方法与 1 类似，但他是将元素的方法包装成 closure.
 
 
+### 其他语言
+
+* C 语言里的`void *`用法在一定程度上就是一种类型擦除。
+* C++ 的模板（template）也是一种类型擦除
+    * 优点：C++ 使用的是`Code Specialization`的方式，它为泛型类的每一种实例都生成独立的代码，不需要运行时判断具体类型，有利于加快代码的执行速度
+    * 缺点：代码膨胀，编译时间长
+* C#: 无论是源代码，还是编译后的中间语言 IL 还是运行时的 CLR，泛型类型符号都是存在的，例如 List<int> 与 List<String>
+* Java: 通过类型擦除，Java 为每个泛型类创建唯一的字节码，也就是说 ArrayList<Int> 和 ArrayList<String> 是同一个类。泛型只是 Java 的语法糖。
+
+### 延伸阅读
+
+* [Generics in Swift 4](https://theswiftpost.co/generics-swift-4/)
+* [Java 的类型擦除](http://www.hollischuang.com/archives/226)
+* [Friday Q&A 2015-11-20: Covariance and Contravariance](https://www.mikeash.com/pyblog/friday-qa-2015-11-20-covariance-and-contravariance.html)
+* [Friday Q&A 2017-12-08: Type Erasure in Swift](https://www.mikeash.com/pyblog/friday-qa-2017-12-08-type-erasure-in-swift.html)
+* [神奇的类型擦除](https://academy.realm.io/cn/posts/altconf-hector-matos-type-erasure-magic/)
+* [Generics](https://github.com/apple/swift/blob/master/docs%2FGenerics.rst)
+* [Generics Manifesto](https://github.com/apple/swift/blob/master/docs/GenericsManifesto.md)
+* [关于序列和集合需要知道的二三事](https://academy.realm.io/cn/posts/try-swift-soroush-khanlou-sequence-collection/)
+* [Breaking Down Type Erasure in Swift](https://www.bignerdranch.com/blog/breaking-down-type-erasure-in-swift/)
+
