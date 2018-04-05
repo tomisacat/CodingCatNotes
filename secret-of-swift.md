@@ -167,4 +167,100 @@ CFDictionarySetValue(dic, Unmanaged.passUnretained(kCMSampleAttachmentKey_Displa
 
 > 参考：[Any vs. AnyObject in Swift 3.0](https://medium.com/@mimicatcodes/any-vs-anyobject-in-swift-3-b1a8d3a02e00)
 
+### 初始化
+
+1. 值类型
+    
+    * 可以存在多个`init`方法，并且可以在某个`init`方法中调用另一个`init`方法（没有 designated 和 convenience 之分）
+    * 如果自定义了初始化方法，则不能再调用默认的成员初始化方法（memberwise initializer）。但是你可以把自定义的方法放到 extension 里，这样就可以继续使用默认的成语初始化方法。
+    * 对于 struct 类型，如果成员都有默认值，那么可以调用无参数初始化方法，或者成员初始化方法，但是不能调用部分参数初始化方法：
+    
+        > 
+        ```
+        struct Point {
+            var x = 0
+            var y = 1
+        }
+        >
+        let a = Point() // 允许
+        let b = Point(x: 1, y: 2) // 允许
+        let c = Point(x: 1) // 错误
+        ```
+2. 引用类型（class）
+      
+    * Designated/Convenience/Override/Required
+    * 规则
+        * 子类的 designated init 只能调用它的**直接父类**的 designated init 方法。不可以调用它本身的其他 designated init 方法或者祖先类（例如，父类的父类）的 designated init 方法。
+        * convenience init 必须要调用**它本身**的初始化方法，这个初始化方法可以是 convenience init 方法，但最终要调用到本身的一个 designated init 方法
+        * 如果父类没有 property 属性，或者父类 property 都有初始值，或者父类的无参 designated init 方法初始化好了全部的 property，则子类不一定需要显式地调用 super.init 方法：
+            
+            >
+            ```
+            // 1. 父类无 property
+            class Parent { } // 实际上编译器会插入一个默认无参数的 init 方法
+            class Son: Parent {
+                let a: String
+                init(aa: String) {
+                    a = aa
+                }
+            }
+            ```
+            >
+            ```
+            // 2. 父类 property 有初始值
+            class Parent {
+                let p = "pp"
+            }
+            class Son {
+                let a: String
+                init(aa: String) {
+                    a = aa
+                }
+            }
+            ```
+            >
+            ```
+            // 3. 父类的无参 designated init 方法初始化了全部 property
+            class Parent {
+                let p: String
+                init() {
+                    p = "pp"
+                }
+            }
+            class Son {
+                let a: String
+                init(aa: String) {
+                    a = aa
+                }
+            }
+            ```
+        * convenience init 方法在设置任何 property 之前必须先调用一个最终调用 designated init 方法的 init 方法（也就是说，它可以调用一个 designated init 方法来初始化，但也可以调用另一个 convenience init 方法，这个方法里面调用了 designated init 方法）。
+    * 与 ObjC 不同，Swift 子类默认不会继承父类的初始化方法，这样可以避免实例化子类的时候误用了父类的初始化方法，导致没有完全初始化：
+        
+        >
+        ```
+        class Parent {
+            let b: String
+            init(bb: String) {
+                b = bb
+            }
+        }
+        class Son: Parent {
+            let a: String
+            init(aa: String) {
+                a = aa
+                super.init(bb: "bb")
+            }
+        }
+        let s = Son(bb: "xx") // 错误
+        ```
+        
+        但是：
+        
+        * 如果子类没有自定义 designated init 方法，则子类自动继承父类所有的 designated init 方法
+    
+    * 子类可以重写父类的 designated init 方法，并用 override 标记，并且这个子类的初始化方法可以是 convenience init 方法
+    * 子类如果重写父类的 convenience init 方法，则父类的这个方法将会被屏蔽，不能直接调用
+        
+3. [官方文档](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Initialization.html)   
 

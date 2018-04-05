@@ -61,6 +61,81 @@
 
 ### URLSessionDelegate
 
+* urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?)
+* urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Swift.Void)
+
+    > 有些鉴权类型可以被应用到多个请求上，例如 SSL
+* urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
+
+##### URLSessionTaskDelegate
+
+* urlSession(_ session: URLSession, task: URLSessionTask, willBeginDelayedRequest request: URLRequest, completionHandler: @escaping (URLSession.DelayedRequestDisposition, URLRequest?) -> Swift.Void)
+    
+    > iOS 11 新加入的，当一个被延迟执行的 task 开始执行的时候会先调用这个代理方法。如果修改了 request，那么新的 `request.allowCellularAccess` 属性会被忽略，继续使用原来请求的这个属性值
+* urlSession(_ session: URLSession, taskIsWaitingForConnectivity task: URLSessionTask)
+
+    > 如果一个 task 的 `waitsForConnectivity` 属性置为 true 且当前网络不好时会调用这个方法；但如果是一个 background session 则会忽略这个属性（也就不会执行这个代理方法）
+* urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Swift.Void)
+
+    > 如果传一个 nil 给 completionHandler，那么新请求 newRequest 将会把 response 的 body 部分作为负载（payload）
+    > background session 不会调用这个方法，直接执行默认的重定向操作
+* urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Swift.Void)
+
+    > 如果没有实现这个方法，那么也不会调用 session 的鉴权方法，直接使用默认的系统处理方式
+* urlSession(_ session: URLSession, task: URLSessionTask, needNewBodyStream completionHandler: @escaping (InputStream?) -> Swift.Void)
+* urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64)
+
+    > 定期调用这个方法来通知上传进度
+    > task 类也有相应的属性获取这些值
+* urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics)
+* urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?)
+
+##### URLSessionDataDelegate
+
+* urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Swift.Void)
+
+    > 收到 response
+    > background 上传任务不会调用这个方法
+* urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didBecome downloadTask: URLSessionDownloadTask)
+* urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didBecome streamTask: URLSessionStreamTask)
+* urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data)
+
+    > delegate 应该强引用而不是拷贝 data 
+    > 由于数据可能是不连续的，应该使用 Data 的 `enumerateBytes` 方法访问数据
+* urlSession(_ session: URLSession, dataTask: URLSessionDataTask, willCacheResponse proposedResponse: CachedURLResponse, completionHandler: @escaping (CachedURLResponse?) -> Swift.Void)
+
+##### URLSessionDownloadDelegate
+
+* urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
+
+    > 当这个方法执行完，文件将会被删除，所以你应该在这个方法里将文件拷贝到一个合适的地方
+* urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64)
+* urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didResumeAtOffset fileOffset: Int64, expectedTotalBytes: Int64)
+
+##### URLSessionStreamDelegate
+
+* urlSession(_ session: URLSession, readClosedFor streamTask: URLSessionStreamTask)
+* urlSession(_ session: URLSession, writeClosedFor streamTask: URLSessionStreamTask)
+* urlSession(_ session: URLSession, betterRouteDiscoveredFor streamTask: URLSessionStreamTask)
+* urlSession(_ session: URLSession, streamTask: URLSessionStreamTask, didBecome inputStream: InputStream, outputStream: OutputStream)
+
+##### 几个枚举
+
+1. DelayedRequestDisposition
+    * continueLoading
+    * useNewRequest
+    * cancel
+2. AuthChallengeDisposition
+    * useCredential
+    * performDefaultHandling
+    * cancelAuthenticationChallenge
+    * rejectProtectionSpace
+3. ResponseDisposition
+    * cancel: 跟 task.cancel() 相同
+    * allow
+    * becomeDownload
+    * becomeStream
+
 ### URL
 
 1. 属性
