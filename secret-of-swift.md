@@ -134,6 +134,10 @@ CFDictionarySetValue(dic, Unmanaged.passUnretained(kCMSampleAttachmentKey_Displa
     ```
     
     上面的例子中，1 和 2 是等价的，当你使用 `try?` 的时候，可能的异常抛出会被转化为一个 nil 值。
+    
+4. throws 和 rethrows 区别
+    * rethrows 方法必须要有一个标记为 throws 的参数（但是调用时你可以传入一个不会抛出错误的方法参数）
+    * 对于 rethrows 方法，只有当传入的参数确实会抛出错误时你才需要处理错误。所以，当传入的方法参数不是 throws 方法时，不需要用 do-try-catch 处理，也不会继续向上抛出错误。
 
 ### UnsafeMutablePointer/UnsafeMutableBufferPointer/UnsafeMutableRawBufferPointer
 
