@@ -12,7 +12,7 @@ Buffer 表示内存里的一段连续空间，但通常被看成是一个连续�
 * 每个元素描述一个单独的像素颜色
 * Buffer 的大小和图片大小成正比
 
-一个很重要的 Buffer 叫做 **frame buffer**，它用来存储应用实际的渲染输出，当应用的视图层级发生变化的时候，UIKit 将应用的 Window 以及它的子视图渲染到 frame buffer 里，这个 frame buffer 存储了每个像素的颜色信息，显示设备将读取 frame buffer 里的信息并显示到屏幕上。
+另一个很重要的 Buffer 叫做 **frame buffer**，它用来存储应用实际的渲染输出，当应用的视图层级发生变化的时候，UIKit 将应用的 Window 以及它的子视图渲染到 frame buffer 里，这个 frame buffer 存储了每个像素的颜色信息，显示设备将读取 frame buffer 里的信息并显示到屏幕上。
 
 作为对比，我们看一下 **Data Buffer**：
 
@@ -40,11 +40,11 @@ Buffer 表示内存里的一段连续空间，但通常被看成是一个连续�
 
 节省内存使用的一个方法叫降采样（Downsampling）：
 
-![](/images/downsampling.png)
+![](images/downsampling.png)
 
 这个方法是使用 ImageIO 里的 CGImage 相关操作，按照想要的大小（一般为视图大小）来解码图片并渲染到视图上：
 
-![](/images/downsampling_code.png)
+![](images/downsampling_code.png)
 
 上面的代码有几个需要注意的地方：
 
@@ -71,7 +71,7 @@ kCGImageSourceShouldCacheImmediately: true,
 
 例如：
 
-![](/images/prefetch_downsampling.png)
+![](images/prefetch_downsampling.png)
 
 但是上面的做法可能会造成线程爆炸的问题：
 
@@ -81,7 +81,7 @@ kCGImageSourceShouldCacheImmediately: true,
 
 为了避免上面这些问题，我们应该创建一个串行队列来负责解码和降采样：
 
-![](/images/serial_queue_downsampling.png)
+![](images/serial_queue_downsampling.png)
 
 ##### 图片资源来源
 
@@ -101,7 +101,7 @@ kCGImageSourceShouldCacheImmediately: true,
 
 与位图类似，只不过中间的解码步骤变成了光栅化操作：
 
-![](/images/vector_pipeline.png)
+![](images/vector_pipeline.png)
 
 向量图做了下面这些优化：
 
@@ -111,7 +111,7 @@ kCGImageSourceShouldCacheImmediately: true,
 
 ### Custom drawing with UIKit
 
- ![](/images/uiimageview_vs_uiview.png)
+ ![](images/uiimageview_vs_uiview.png)
  
  对于 UIImageView 来说，它请求 CPU 对图片解码并将解码后的图片赋给与它关联的 CALayer，而 UIView 则是由与它关联的 CALayer 创建一个 Backing store（image buffer），然后 UIView 执行 draw 函数并将执行的结果填充到 image buffer 里。
  
